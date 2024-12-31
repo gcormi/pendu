@@ -10,7 +10,7 @@
             text-align: center;
             background-color: #f0f0f0;
         }
-        #word, #guesses, #hangman {
+        #word, #guesses, #hangman, #message {
             font-size: 24px;
             margin: 20px 0;
         }
@@ -26,20 +26,24 @@
     <div id="word"></div>
     <div id="guesses">Lettres essayées : </div>
     <div id="hangman"></div>
+    <div id="message"></div>
     <div id="alphabet"></div>
 
     <script>
         const words = ['ECOLE', 'CRAYON', 'LIVRE', 'CAHIER', 'TABLEAU'];
         let word = '';
         let guessedLetters = [];
-        let remainingGuesses = 6;
+        let remainingGuesses = 5;
+        let gameOver = false;
 
         function initGame() {
             word = words[Math.floor(Math.random() * words.length)];
             guessedLetters = [];
-            remainingGuesses = 6;
+            remainingGuesses = 5;
+            gameOver = false;
             updateDisplay();
             createAlphabet();
+            document.getElementById('message').textContent = '';
         }
 
         function updateDisplay() {
@@ -62,23 +66,33 @@
         }
 
         function guessLetter(letter) {
-            if (!guessedLetters.includes(letter)) {
-                guessedLetters.push(letter);
-                if (!word.includes(letter)) {
-                    remainingGuesses--;
-                }
-                updateDisplay();
-                checkGameStatus();
+            if (gameOver || guessedLetters.includes(letter)) return;
+
+            guessedLetters.push(letter);
+            if (!word.includes(letter)) {
+                remainingGuesses--;
             }
+            updateDisplay();
+            checkGameStatus();
         }
 
         function checkGameStatus() {
             if (word === document.getElementById('word').textContent.replace(/ /g, '')) {
-                alert('Bravo ! Vous avez gagné !');
-                initGame();
+                if (remainingGuesses >= 1) {
+                    document.getElementById('message').textContent = 'Bravo ! Vous avez gagné ! Mot magique : PO%?/54';
+                } else {
+                    document.getElementById('message').textContent = 'Bravo ! Vous avez gagné !';
+                }
+                gameOver = true;
             } else if (remainingGuesses === 0) {
-                alert('Dommage ! Le mot était : ' + word);
-                initGame();
+                document.getElementById('message').textContent = 'Dommage ! Le mot était : ' + word;
+                gameOver = true;
+            } else if (remainingGuesses === 3) {
+                document.getElementById('message').textContent = 'Indice : La première lettre est ' + word[0];
+            }
+
+            if (gameOver) {
+                document.getElementById('alphabet').innerHTML = '<button onclick="initGame()">Recommencer</button>';
             }
         }
 
