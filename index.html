@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeu du Pendu</title>
+    <title>Jeu du Pendu - Sources d'Énergie</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f0f0f0;
         }
-        #word, #guesses, #hangman, #message {
-            font-size: 24px;
+        #definition, #word, #guesses, #hangman, #message {
+            font-size: 18px;
             margin: 20px 0;
         }
         button {
@@ -22,7 +22,8 @@
     </style>
 </head>
 <body>
-    <h1>Jeu du Pendu</h1>
+    <h1>Jeu du Pendu - Sources d'Énergie</h1>
+    <div id="definition"></div>
     <div id="word"></div>
     <div id="guesses">Lettres essayées : </div>
     <div id="hangman"></div>
@@ -30,24 +31,32 @@
     <div id="alphabet"></div>
 
     <script>
-        const words = ['ECOLE', 'CRAYON', 'LIVRE', 'CAHIER', 'TABLEAU'];
-        let word = '';
+        const words = [
+            {word: 'SOLAIRE', def: "Cette source d'énergie provient de l'astre qui brille dans le ciel pendant la journée."},
+            {word: 'EOLIENNE', def: "Cette énergie est captée par de grandes hélices qui tournent avec le vent."},
+            {word: 'NUCLEAIRE', def: "Cette source d'énergie utilise la fission d'atomes pour produire de l'électricité."},
+            {word: 'HYDRAULIQUE', def: "Cette énergie est produite grâce à la force de l'eau, souvent dans des barrages."},
+            {word: 'BIOMASSE', def: "Cette source d'énergie utilise des matières organiques comme le bois ou les déchets végétaux."}
+        ];
+        let currentWord;
         let guessedLetters = [];
         let remainingGuesses = 5;
         let gameOver = false;
+        const magicWord = "PO%?/54";
 
         function initGame() {
-            word = words[Math.floor(Math.random() * words.length)];
+            currentWord = words[Math.floor(Math.random() * words.length)];
             guessedLetters = [];
             remainingGuesses = 5;
             gameOver = false;
             updateDisplay();
             createAlphabet();
+            document.getElementById('definition').textContent = currentWord.def;
             document.getElementById('message').textContent = '';
         }
 
         function updateDisplay() {
-            document.getElementById('word').textContent = word.split('').map(letter => 
+            document.getElementById('word').textContent = currentWord.word.split('').map(letter => 
                 guessedLetters.includes(letter) ? letter : '_').join(' ');
             document.getElementById('guesses').textContent = 'Lettres essayées : ' + guessedLetters.join(', ');
             document.getElementById('hangman').textContent = '❤️'.repeat(remainingGuesses);
@@ -69,7 +78,7 @@
             if (gameOver || guessedLetters.includes(letter)) return;
 
             guessedLetters.push(letter);
-            if (!word.includes(letter)) {
+            if (!currentWord.word.includes(letter)) {
                 remainingGuesses--;
             }
             updateDisplay();
@@ -77,22 +86,16 @@
         }
 
         function checkGameStatus() {
-            if (word === document.getElementById('word').textContent.replace(/ /g, '')) {
-                if (remainingGuesses >= 1) {
-                    document.getElementById('message').textContent = 'Bravo ! Vous avez gagné ! Mot magique : PO%?/54';
-                } else {
-                    document.getElementById('message').textContent = 'Bravo ! Vous avez gagné !';
-                }
+            if (currentWord.word === document.getElementById('word').textContent.replace(/ /g, '')) {
+                document.getElementById('message').innerHTML = `Bravo ! Vous avez gagné !<br>Le mot magique est : ${magicWord}<br>Vous devez retenir ce mot magique pour continuer.`;
                 gameOver = true;
             } else if (remainingGuesses === 0) {
-                document.getElementById('message').textContent = 'Dommage ! Le mot était : ' + word;
+                document.getElementById('message').innerHTML = `Dommage ! Le mot était : ${currentWord.word}<br>Vous n'avez pas obtenu le mot magique. Vous ne pouvez pas recommencer.`;
                 gameOver = true;
-            } else if (remainingGuesses === 3) {
-                document.getElementById('message').textContent = 'Indice : La première lettre est ' + word[0];
             }
 
             if (gameOver) {
-                document.getElementById('alphabet').innerHTML = '<button onclick="initGame()">Recommencer</button>';
+                document.getElementById('alphabet').innerHTML = '';
             }
         }
 
