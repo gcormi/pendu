@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu du Pendu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        #word, #guesses, #hangman {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        button {
+            font-size: 18px;
+            margin: 5px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jeu du Pendu</h1>
+    <div id="word"></div>
+    <div id="guesses">Lettres essayées : </div>
+    <div id="hangman"></div>
+    <div id="alphabet"></div>
+
+    <script>
+        const words = ['ECOLE', 'CRAYON', 'LIVRE', 'CAHIER', 'TABLEAU'];
+        let word = '';
+        let guessedLetters = [];
+        let remainingGuesses = 6;
+
+        function initGame() {
+            word = words[Math.floor(Math.random() * words.length)];
+            guessedLetters = [];
+            remainingGuesses = 6;
+            updateDisplay();
+            createAlphabet();
+        }
+
+        function updateDisplay() {
+            document.getElementById('word').textContent = word.split('').map(letter => 
+                guessedLetters.includes(letter) ? letter : '_').join(' ');
+            document.getElementById('guesses').textContent = 'Lettres essayées : ' + guessedLetters.join(', ');
+            document.getElementById('hangman').textContent = '❤️'.repeat(remainingGuesses);
+        }
+
+        function createAlphabet() {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const alphabetDiv = document.getElementById('alphabet');
+            alphabetDiv.innerHTML = '';
+            alphabet.split('').forEach(letter => {
+                const button = document.createElement('button');
+                button.textContent = letter;
+                button.onclick = () => guessLetter(letter);
+                alphabetDiv.appendChild(button);
+            });
+        }
+
+        function guessLetter(letter) {
+            if (!guessedLetters.includes(letter)) {
+                guessedLetters.push(letter);
+                if (!word.includes(letter)) {
+                    remainingGuesses--;
+                }
+                updateDisplay();
+                checkGameStatus();
+            }
+        }
+
+        function checkGameStatus() {
+            if (word === document.getElementById('word').textContent.replace(/ /g, '')) {
+                alert('Bravo ! Vous avez gagné !');
+                initGame();
+            } else if (remainingGuesses === 0) {
+                alert('Dommage ! Le mot était : ' + word);
+                initGame();
+            }
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
